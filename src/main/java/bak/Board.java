@@ -1,10 +1,9 @@
-package controller;
+package bak;
 
 import javafx.geometry.Pos;
 import javafx.scene.layout.GridPane;
-import utils.Position;
+import model.Position;
 
-import java.util.ArrayList;
 import java.lang.Math;
 import java.util.Vector;
 
@@ -47,19 +46,11 @@ public class Board {
     }
 
     public void setPieceNum(int pieceNum) {
-        for (int i=1;i<5;i++){
-            if (pieceNum % (int)Math.pow(2, i) == 0){
-                this.pieceNum = pieceNum;
-                break;
-            }else{
-                System.err.println("输入的棋子数量不满足条件");
-            }
+        if (0 == (pieceNum & (pieceNum - 1))){
+            this.pieceNum = pieceNum;
+        }else{
+            System.err.println("输入的棋子数量不满足条件");
         }
-//        if (pieceNum % 16 == 0 || pieceNum % 8 == 0 || pieceNum % 4 == 0 || pieceNum % 2 == 0){
-//            this.pieceNum = pieceNum;
-//        }else{
-//            System.err.println("输入的棋子数量不满足条件");
-//        }
     }
 
     private void generateBoard(){

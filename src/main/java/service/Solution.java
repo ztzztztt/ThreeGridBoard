@@ -26,14 +26,13 @@ public class Solution{
         this.chessBoard = chessBoard;
         imComplete = chessBoard.getImComPosition();
         chessBoardSize = chessBoard.getBoardSize();
-
     }
 
     /**
      * 求解问题入口类，用于参数准备
      * 递归求解该问题的类
      */
-    public void solve() {
+    private void solve() {
         chessBoardSize = chessBoard.getBoardSize();
         imComplete = chessBoard.getImComPosition();
         if (this.chessBoardSize <= 2) {
@@ -101,8 +100,7 @@ public class Solution{
                 Platform.runLater(() -> solve());
             }
             // 利用反射设置其延时的值
-            private void setDeclaredField(Class<?> clazz, Object obj,
-                                          String name, Object value) {
+            private void setDeclaredField(Class<?> clazz, Object obj, String name, Object value) {
                 try {
                     Field field = clazz.getDeclaredField(name);
                     field.setAccessible(true);
