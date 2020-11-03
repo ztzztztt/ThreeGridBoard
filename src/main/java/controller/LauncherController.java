@@ -6,6 +6,7 @@ import javafx.scene.control.Toggle;
 import javafx.scene.layout.AnchorPane;
 import model.ChessBoard;
 import service.Solution;
+import service.Task;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -75,7 +76,6 @@ public class LauncherController {
     // 求解问题事件监听
     private void autoButtonEventListener(){
         toolMenuController.getAutoStartButton().setOnAction(event -> {
-//            solution.solve();
             solution.resolve();
             toolMenuController.getAutoStartButton().setDisable(true);
         });
@@ -84,7 +84,7 @@ public class LauncherController {
     // 速度滚动条事件监听
     private void speedSliderEventListener(){
         toolMenuController.getSpeedSlider().valueProperty().addListener((ov, oldValue, newValue) -> {
-            Solution.delay = newValue.doubleValue() / 100.0;
+            Solution.setDelay(newValue.doubleValue() / 100.0);
             toolMenuController.setSpeedShowLabel(newValue.intValue());
         });
     }

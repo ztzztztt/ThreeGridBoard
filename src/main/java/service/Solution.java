@@ -3,11 +3,8 @@ package service;
 import javafx.application.Platform;
 import model.ChessBoard;
 import model.Position;
-
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * @author by zhoutao
@@ -16,8 +13,7 @@ import java.util.TimerTask;
  */
 public class Solution{
 
-    public static double delay = 0.0;
-
+    private static double delay = 0.0;
     private int chessBoardSize;
     private Position imComplete;
     private ChessBoard chessBoard;
@@ -32,7 +28,7 @@ public class Solution{
      * 求解问题入口类，用于参数准备
      * 递归求解该问题的类
      */
-    private void solve() {
+    private void solve(){
         chessBoardSize = chessBoard.getBoardSize();
         imComplete = chessBoard.getImComPosition();
         if (this.chessBoardSize <= 2) {
@@ -49,8 +45,8 @@ public class Solution{
             // 将其中一个中心点替换为先前残缺的点
             midFourPositionList.set(area, this.imComplete);
             for (int i = 0; i < 4; i++) {
-                ChessBoard topLeftBoard = chessBoard.copyChessBoardPartial(midFourPositionList.get(i), chessBoardSize / 2, i);
-                Solution solution = new Solution(topLeftBoard);
+                ChessBoard tempBoard = chessBoard.copyChessBoardPartial(midFourPositionList.get(i), chessBoardSize / 2, i);
+                Solution solution = new Solution(tempBoard);
                 solution.resolve();
             }
         }
@@ -90,29 +86,20 @@ public class Solution{
         return (imComplete.getPositionX() < midX ? 0 : 1) * 2 + (imComplete.getPositionY() < midY ? 0 : 1);
     }
 
-
     public void resolve(){
         Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
+        Task task = new Task() {
             @Override
             public void run() {
-                dynamicDelay(Solution.delay);
+                dynamicDelay(delay);
                 Platform.runLater(() -> solve());
             }
-            // 利用反射设置其延时的值
-            private void setDeclaredField(Class<?> clazz, Object obj, String name, Object value) {
-                try {
-                    Field field = clazz.getDeclaredField(name);
-                    field.setAccessible(true);
-                    field.set(obj, value);
-                } catch (Exception ex) {
-                    System.out.println(ex.toString());
-                }
-            }
-            // 修改值
-            public void dynamicDelay(double delay) {
-                setDeclaredField(TimerTask.class, this, "period", (long)(delay * 1000.0));
-            }
-        }, (long) (Solution.delay * 1000.0));
+        };
+        Task.setCurrentTimeMillis(System.currentTimeMillis());
+        timer.schedule(task, (long)  (Solution.delay * 2000.0));
+    }
+
+    public static void setDelay(double delay) {
+        Solution.delay = delay;
     }
 }
