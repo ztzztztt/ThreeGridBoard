@@ -1,108 +1,120 @@
 package service;
 
-import controller.Piece;
-import controller.ThreeGrid;
-import factory.ThreeGridFactory;
-import javafx.geometry.Pos;
-import utils.Position;
+import javafx.application.Platform;
+import model.ChessBoard;
+import model.Position;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Vector;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author by zhoutao
- * @description 解决三格版的类
+ * @description 解决三格版问题的类
  * @date 2020/10/30 17:28
  */
-public class Solution {
-    int pieceNum;
-    Position position;
-    Vector<Vector<Piece>> table;
-    ArrayList<Position> arrayList = new ArrayList<>(4);
+public class Solution{
 
+    public static double delay = 0.0;
 
-    private void initHashMap(){
-        arrayList.add(new Position(0, 0));
-        arrayList.add(new Position(0, 1));
-        arrayList.add(new Position(1, 0));
-        arrayList.add(new Position(1, 1));
+    private int chessBoardSize;
+    private Position imComplete;
+    private ChessBoard chessBoard;
+
+    public Solution(ChessBoard chessBoard) {
+        this.chessBoard = chessBoard;
+        imComplete = chessBoard.getImComPosition();
+        chessBoardSize = chessBoard.getBoardSize();
+
     }
 
-    public Solution(Vector<Vector<Piece>> table, Position position, int pieceNum){
-        this.table = table;
-        this.position = position;
-        this.pieceNum = pieceNum;
-        initHashMap();
-    }
-
-    public void resolve(Vector<Vector<Piece>> table, Position position, int pieceNum){
-        if (this.table.size() == 2){
-            int threeGridId = judgeThreeGrid();
-            ThreeGrid threeGrid = ThreeGridFactory.getThreeGridFactory().getThreeGrid(threeGridId);
-            threeGrid.setCount(threeGrid.getCount() + 1);
-            changePieceColor(threeGridId);
+    /**
+     * 求解问题入口类，用于参数准备
+     * 递归求解该问题的类
+     */
+    public void solve() {
+        chessBoardSize = chessBoard.getBoardSize();
+        imComplete = chessBoard.getImComPosition();
+        if (this.chessBoardSize <= 2) {
+            // 获取缺失点所在区域
+            int area = this.judgeImCompleteArea(chessBoardSize, imComplete);
+            this.chessBoard.changeColor(area);
         } else {
-            // 计算出缺失的点所在方位
-            // (0, 1): 左上, (0, 1): 右上, (1, 0): 左下, (1, 1): 右下
-            int missingPositionX = 2 * this.position.getPositionX() / this.pieceNum;
-            int missingPositionY = 2 * this.position.getPositionY() / this.pieceNum;
-            int missingId = missingPositionX * 2 + missingPositionY;
-            // 获取对应的三格版
-            ThreeGrid threeGrid = ThreeGridFactory.getThreeGridFactory().getThreeGrid(missingId);
-            threeGrid.setCount(threeGrid.getCount() + 1);
-
-            // 获取需要修改颜色的位置
-            int base = this.pieceNum / 2;
-
-            for (int i=0;i<4;i++){
-                Position newPosition = new Position(base + arrayList.get(i).getPositionX() , base + arrayList.get(i).getPositionY());
-                changePieceColor(newPosition, missingId);
-                Vector<Vector<Piece>> newTable = new Vector<>();
-                int xGreatThanHalf = newPosition.getPositionX() > this.pieceNum / 2 ? 1 : 0;
-                int yGreatThanHalf = newPosition.getPositionY() > this.pieceNum / 2 ? 1 : 0;
-                int startX = xGreatThanHalf * ((this.pieceNum + 1) / 2);
-                int startY = yGreatThanHalf * ((this.pieceNum + 1) / 2);
-                for (int j=startX;j<startX + this.pieceNum / 2;j++){
-                    Vector<Piece> v = new Vector<>();
-                    for(int k=startY; k<startY + this.pieceNum / 2;k++){
-                        v.add(table.get(i).get(j));
-                    }
-                    newTable.add(v);
-                }
-                if (i == missingId){
-                    resolve(newTable, position, pieceNum / 2);
-                } else{
-                    resolve(newTable, newPosition, pieceNum / 2);
-                }
+            // 获取到中心四个点
+            ArrayList<Position> midFourPositionList = this.genMiddleFourPosition(chessBoardSize);
+            // 获取缺失的点所在区域
+            int area = this.judgeImCompleteArea(chessBoardSize, imComplete);
+            // 填充
+            this.chessBoard.changeColor(midFourPositionList, area);
+            // 将其中一个中心点替换为先前残缺的点
+            midFourPositionList.set(area, this.imComplete);
+            for (int i = 0; i < 4; i++) {
+                ChessBoard topLeftBoard = chessBoard.copyChessBoardPartial(midFourPositionList.get(i), chessBoardSize / 2, i);
+                Solution solution = new Solution(topLeftBoard);
+                solution.resolve();
             }
         }
     }
 
-    public int judgeThreeGrid(){
-        int threeGridId = -1;
-        for (int i=0;i<table.size();i++){
-            for (int j=0;j<table.size();j++){
-                if (table.get(i).get(j).isImComplete()){
-                    threeGridId = i * 2 + j;
-                }
-            }
-        }
-        return threeGridId;
+    /**
+     * 获取棋盘中心四个点的坐标
+     * @param chessBoarsSize 棋盘大小
+     * @return ArrayList 四个点的列表
+     */
+    private ArrayList<Position> genMiddleFourPosition(int chessBoarsSize) {
+        // 根据棋盘长度获取到棋盘中心四个点
+        ArrayList<Position> arrayList = new ArrayList<>(4);
+        // 棋盘长度除以2获取右下角的点
+        Position bottomRight = new Position(chessBoarsSize / 2, chessBoarsSize / 2);
+        // 右下角坐标Y减去1获得左下角点
+        Position bottomLeft = new Position(bottomRight.getPositionX(), bottomRight.getPositionY() - 1);
+        // 右下角坐标XY减去1获得左上角点
+        Position topLeft = new Position(bottomRight.getPositionX() - 1, bottomRight.getPositionY() - 1);
+        // 右下角坐标X减去1获得右上角点
+        Position topRight = new Position(bottomRight.getPositionX() - 1, bottomRight.getPositionY());
+        arrayList.add(topLeft);
+        arrayList.add(topRight);
+        arrayList.add(bottomLeft);
+        arrayList.add(bottomRight);
+        return arrayList;
     }
 
-    public void changePieceColor(int threeGridId){
-        table.forEach(v -> v.forEach(piece -> piece.setColorKey(threeGridId)));
+    /**
+     * @param chessBoardSize 棋盘大小
+     * @param imComplete     缺失点的坐标
+     * @return int 缺失点所在区域，左上0，右上1，左下2，右下3
+     */
+    private int judgeImCompleteArea(int chessBoardSize, Position imComplete) {
+        double midX = chessBoardSize / 2.0;
+        double midY = chessBoardSize / 2.0;
+        return (imComplete.getPositionX() < midX ? 0 : 1) * 2 + (imComplete.getPositionY() < midY ? 0 : 1);
     }
 
-    public void changePieceColor(Position position, int threeGridId){
-        for (int i=0;i<this.pieceNum;i++){
-            for (int j=0;j<this.pieceNum;j++){
-                if (i == position.getPositionX() && j == position.getPositionY()){
-                    table.get(i).get(j).setColorKey(threeGridId);
+
+    public void resolve(){
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                dynamicDelay(Solution.delay);
+                Platform.runLater(() -> solve());
+            }
+            // 利用反射设置其延时的值
+            private void setDeclaredField(Class<?> clazz, Object obj,
+                                          String name, Object value) {
+                try {
+                    Field field = clazz.getDeclaredField(name);
+                    field.setAccessible(true);
+                    field.set(obj, value);
+                } catch (Exception ex) {
+                    System.out.println(ex.toString());
                 }
             }
-        }
+            // 修改值
+            public void dynamicDelay(double delay) {
+                setDeclaredField(TimerTask.class, this, "period", (long)(delay * 1000.0));
+            }
+        }, (long) (Solution.delay * 1000.0));
     }
 }

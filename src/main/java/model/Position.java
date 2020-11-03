@@ -1,4 +1,6 @@
-package utils;
+package model;
+
+import javafx.geometry.Pos;
 
 /**
  * @author by zhoutao
@@ -36,4 +38,9 @@ public class Position {
         this.positionX = 0;
         this.positionY = 0;
     }
+
+    public Position deepCopy(){
+        return new Position(this.positionX, this.positionY);
+    }
+
 }
