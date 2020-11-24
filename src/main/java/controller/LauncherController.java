@@ -1,16 +1,12 @@
 package controller;
 
+
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Toggle;
 import javafx.scene.layout.AnchorPane;
 import model.ChessBoard;
 import service.Solution;
-import service.Task;
-
-import java.util.Timer;
-import java.util.TimerTask;
-
 /**
  * @author by zhoutao
  * @description 页面布局类
@@ -72,11 +68,17 @@ public class LauncherController {
     }
 
     private final Solution solution = new Solution(ChessBoard.getInstance());
-
     // 求解问题事件监听
     private void autoButtonEventListener(){
         toolMenuController.getAutoStartButton().setOnAction(event -> {
-            solution.resolve();
+            new Thread(){
+                @Override
+                public void run() {
+                    super.run();
+                    solution.resolve();
+                }
+            }.start();
+//            solution.resolve();
             toolMenuController.getAutoStartButton().setDisable(true);
         });
     }
@@ -84,8 +86,19 @@ public class LauncherController {
     // 速度滚动条事件监听
     private void speedSliderEventListener(){
         toolMenuController.getSpeedSlider().valueProperty().addListener((ov, oldValue, newValue) -> {
-            Solution.setDelay(newValue.doubleValue() / 100.0);
-            toolMenuController.setSpeedShowLabel(newValue.intValue());
+//            Solution.setDelay(newValue.doubleValue() / 100.0);
+            new Thread() {
+                @Override
+                public void run() {
+                    super.run();
+
+                    Platform.runLater(()-> {
+                        Solution.setDelay(newValue.doubleValue() / 100.0);
+                        toolMenuController.setSpeedShowLabel(newValue.intValue());
+                    });
+                }
+            }.start();
+//            toolMenuController.setSpeedShowLabel(newValue.intValue());
         });
     }
 

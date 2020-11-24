@@ -1,17 +1,19 @@
 package service;
 
+
 import javafx.application.Platform;
 import model.ChessBoard;
 import model.Position;
 import java.util.ArrayList;
 import java.util.Timer;
 
+
 /**
  * @author by zhoutao
  * @description 解决三格版问题的类
  * @date 2020/10/30 17:28
  */
-public class Solution{
+public class Solution implements Runnable{
 
     private static double delay = 0.0;
     private int chessBoardSize;
@@ -24,16 +26,21 @@ public class Solution{
         chessBoardSize = chessBoard.getBoardSize();
     }
 
+    private void init(){
+        chessBoardSize = chessBoard.getBoardSize();
+        imComplete = chessBoard.getImComPosition();
+    }
+
     /**
      * 求解问题入口类，用于参数准备
      * 递归求解该问题的类
      */
     private void solve(){
-        chessBoardSize = chessBoard.getBoardSize();
-        imComplete = chessBoard.getImComPosition();
+        this.init();
         if (this.chessBoardSize <= 2) {
             // 获取缺失点所在区域
             int area = this.judgeImCompleteArea(chessBoardSize, imComplete);
+            // 绘制图形区域，修改颜色
             this.chessBoard.changeColor(area);
         } else {
             // 获取到中心四个点
@@ -50,6 +57,7 @@ public class Solution{
                 solution.resolve();
             }
         }
+
     }
 
     /**
@@ -86,20 +94,46 @@ public class Solution{
         return (imComplete.getPositionX() < midX ? 0 : 1) * 2 + (imComplete.getPositionY() < midY ? 0 : 1);
     }
 
-    public void resolve(){
-        Timer timer = new Timer();
-        Task task = new Task() {
+    public void resolve() {
+//        delay();
+//        Platform.runLater(this::solve);
+        new Thread(){
             @Override
             public void run() {
-                dynamicDelay(delay);
+                super.run();
+                delay();
                 Platform.runLater(() -> solve());
             }
-        };
-        Task.setCurrentTimeMillis(System.currentTimeMillis());
-        timer.schedule(task, (long)  (Solution.delay * 2000.0));
+        }.start();
+//        Timer timer = new Timer();
+//        Task task = new Task() {
+//            @Override
+//            public void run() {
+////                dynamicDelay(delay);
+//                delay();
+//                Platform.runLater(() -> solve());
+//            }
+//        };
+//        Task.setCurrentTimeMillis(System.currentTimeMillis());
+//        timer.schedule(task);
     }
 
     public static void setDelay(double delay) {
         Solution.delay = delay;
     }
+
+    public synchronized static void delay(){
+        try {
+            Thread.sleep((long) (Solution.delay * 1000.0));
+        } catch (InterruptedException e) {
+            System.err.println(e.toString());
+        }
+    }
+
+
+    @Override
+    public void run() {
+        this.resolve();
+    }
 }
+
