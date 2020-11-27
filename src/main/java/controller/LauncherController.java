@@ -1,18 +1,25 @@
 package controller;
 
 
+import events.DraggerEvent;
 import javafx.application.Platform;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Toggle;
 import javafx.scene.layout.AnchorPane;
 import model.ChessBoard;
+import model.Position;
+import model.cell.CellType;
 import service.Solution;
+
+import java.util.ArrayList;
+
 /**
  * @author by zhoutao
  * @description 页面布局类
  * @date 2020/10/31 22:11
  */
 public class LauncherController {
+    int borderSize = 2;
     AnchorPane rootPane;
     ChessBoardController chessBoardController = ChessBoardController.getInstance();
     ThreeGridController threeGridController = ThreeGridController.getInstance();
@@ -51,6 +58,8 @@ public class LauncherController {
         this.radioEventListener();
         this.autoButtonEventListener();
         this.speedSliderEventListener();
+        this.manualStartButtonEventListener();
+        this.cancelButtonEventLister();
     }
 
     // 棋盘设置按钮监听事件
@@ -60,6 +69,7 @@ public class LauncherController {
                 if (toolMenuController.getToggleGroup().getSelectedToggle() != null) {
                     if (!new_Toggle.getUserData().equals("")){
                         threeGridController.resetLabel();
+                        borderSize = Integer.parseInt(new_Toggle.getUserData().toString());
                         chessBoardController.resetDefaultSize(Integer.parseInt(new_Toggle.getUserData().toString()));
                         toolMenuController.getAutoStartButton().setDisable(false);
                     }
@@ -71,6 +81,7 @@ public class LauncherController {
     // 求解问题事件监听
     private void autoButtonEventListener(){
         toolMenuController.getAutoStartButton().setOnAction(event -> {
+            toolMenuController.getCancelButton().setDisable(true);
             new Thread(){
                 @Override
                 public void run() {
@@ -78,33 +89,40 @@ public class LauncherController {
                     solution.resolve();
                 }
             }.start();
-//            solution.resolve();
             toolMenuController.getAutoStartButton().setDisable(true);
+            DraggerEvent.getHashMap().clear();
+            DraggerEvent.setStep(0);
         });
     }
 
     // 速度滚动条事件监听
     private void speedSliderEventListener(){
-        toolMenuController.getSpeedSlider().valueProperty().addListener((ov, oldValue, newValue) -> {
-//            Solution.setDelay(newValue.doubleValue() / 100.0);
-            new Thread() {
-                @Override
-                public void run() {
-                    super.run();
+        toolMenuController.getSpeedSlider().valueProperty().addListener((ov, oldValue, newValue) -> new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                Platform.runLater(()-> {
+                    Solution.setDelay(1.0 - newValue.doubleValue() / 100.0);
+                    toolMenuController.setSpeedShowLabel(newValue.intValue());
+                });
+            }
+        }.start());
+    }
 
-                    Platform.runLater(()-> {
-                        Solution.setDelay(newValue.doubleValue() / 100.0);
-                        toolMenuController.setSpeedShowLabel(newValue.intValue());
-                    });
-                }
-            }.start();
-//            toolMenuController.setSpeedShowLabel(newValue.intValue());
+    public void manualStartButtonEventListener(){
+        toolMenuController.getManualStartButton().setOnAction(event -> {
+            toolMenuController.getCancelButton().setDisable(false);
+            threeGridController.dragEvent();
         });
     }
 
-    private void manualStartButtonEventListener(){
-        toolMenuController.getManualStartButton().setOnAction(event -> {
-
+    public void cancelButtonEventLister(){
+        toolMenuController.getCancelButton().setOnAction(event -> {
+            if (DraggerEvent.getStep() > 0){
+                DraggerEvent.getHashMap().get(DraggerEvent.getStep() - 1).forEach(position -> ChessBoard.getInstance().getTable().get(position.getPositionX()).get(position.getPositionY()).setCellType(CellType.DEFAULT));
+                DraggerEvent.setStep(DraggerEvent.getStep() - 1);
+            }
         });
+
     }
 }

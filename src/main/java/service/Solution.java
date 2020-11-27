@@ -15,7 +15,7 @@ import java.util.Timer;
  */
 public class Solution implements Runnable{
 
-    private static double delay = 0.0;
+    private static double delay = 0.5;
     private int chessBoardSize;
     private Position imComplete;
     private ChessBoard chessBoard;
@@ -95,8 +95,6 @@ public class Solution implements Runnable{
     }
 
     public void resolve() {
-//        delay();
-//        Platform.runLater(this::solve);
         new Thread(){
             @Override
             public void run() {
@@ -105,17 +103,6 @@ public class Solution implements Runnable{
                 Platform.runLater(() -> solve());
             }
         }.start();
-//        Timer timer = new Timer();
-//        Task task = new Task() {
-//            @Override
-//            public void run() {
-////                dynamicDelay(delay);
-//                delay();
-//                Platform.runLater(() -> solve());
-//            }
-//        };
-//        Task.setCurrentTimeMillis(System.currentTimeMillis());
-//        timer.schedule(task);
     }
 
     public static void setDelay(double delay) {
@@ -129,7 +116,6 @@ public class Solution implements Runnable{
             System.err.println(e.toString());
         }
     }
-
 
     @Override
     public void run() {

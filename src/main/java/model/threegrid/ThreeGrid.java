@@ -1,5 +1,8 @@
 package model.threegrid;
 
+import javafx.scene.control.Label;
+import javafx.scene.shape.Circle;
+import model.cell.CellType;
 import model.cell.Cells;
 import java.util.Vector;
 
@@ -20,5 +23,22 @@ public abstract class ThreeGrid {
 
     public int getKey(){
         return this.key;
+    }
+
+    public static Vector<Vector<Cells>> generateThreeGrid(int key, int boardSize){
+        Vector<Vector<Cells>> table = new Vector<>();
+        int cellSize = Math.min(880 / boardSize, 40);
+        for (int i=0;i<boardSize;i++){
+            Vector<Cells> v = new Vector<>();
+            for (int j=0;j<boardSize;j++){
+                if (i * 2 + j == key){
+                    v.add(new Cells(cellSize, cellSize, CellType.INCOMPLETE));
+                    continue;
+                }
+                v.add(new Cells(cellSize, cellSize));
+            }
+            table.add(v);
+        }
+        return table;
     }
 }

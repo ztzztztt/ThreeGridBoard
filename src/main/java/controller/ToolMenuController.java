@@ -29,6 +29,7 @@ public class ToolMenuController {
     private HBox buttonHBox;
     private Button autoStartButton;
     private Button manualStartButton;
+    private Button cancelButton;
 
     private static ToolMenuController toolMenuController;
 
@@ -133,6 +134,14 @@ public class ToolMenuController {
         manualStartButton.setStyle("-fx-border-radius: 25px;");
         HBox.setMargin(manualStartButton, new Insets(0, 10, 0, 10));
         buttonHBox.getChildren().add(manualStartButton);
+
+        cancelButton = new Button();
+        cancelButton.setText("撤销");
+        cancelButton.setMnemonicParsing(false);
+        cancelButton.setStyle("-fx-border-radius: 25px;");
+        HBox.setMargin(cancelButton, new Insets(0, 10, 0, 10));
+        buttonHBox.getChildren().add(cancelButton);
+        cancelButton.setDisable(true);
     }
 
     public VBox getToolMenuVBox(){
@@ -161,5 +170,13 @@ public class ToolMenuController {
         } else {
             System.err.println("输入的速度不能超过0-100");
         }
+    }
+
+    public Button getCancelButton(){
+        return this.cancelButton;
+    }
+
+    public void setCancelButtonIsAble(boolean cancel){
+        this.cancelButton.setDisable(cancel);
     }
 }

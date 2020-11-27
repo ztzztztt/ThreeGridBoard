@@ -1,11 +1,11 @@
 package controller;
 
+
+import events.ClickEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import model.threegrid.*;
 import java.util.ArrayList;
 
@@ -27,7 +27,11 @@ public class ThreeGridController {
 
     VBox threeVBox;
     HBox topLeftRight;
+    VBox topLeft;
+    VBox topRight;
     HBox bottomLeftRight;
+    VBox bottomLeft;
+    VBox bottomRight;
     ArrayList<Label> labelArrayList = new ArrayList<>(4);
 
     private final TopLeftGrid topLeftGrid = TopLeftGrid.getInstance();
@@ -70,16 +74,36 @@ public class ThreeGridController {
         topLeftRight = new HBox();
         topLeftRight.setPrefSize(200.0,200.0);
         topLeftRight.setAlignment(Pos.CENTER);
+
+        topLeft = new VBox();
+        topLeft.setPrefSize(100.0, 200.0);
+        topLeft.setAlignment(Pos.CENTER);
+        topRight = new VBox();
+        topRight.setPrefSize(100.0, 200.0);
+        topRight.setAlignment(Pos.CENTER);
+        topLeftRight.getChildren().add(topLeft);
+        topLeftRight.getChildren().add(topRight);
+
         bottomLeftRight = new HBox();
         bottomLeftRight.setPrefSize(200.0,200.0);
         bottomLeftRight.setAlignment(Pos.CENTER);
+
+        bottomLeft = new VBox();
+        bottomLeft.setPrefSize(100.0, 200.0);
+        bottomLeft.setAlignment(Pos.CENTER);
+        bottomRight = new VBox();
+        bottomRight.setPrefSize(100.0, 200.0);
+        bottomRight.setAlignment(Pos.CENTER);
+
+        bottomLeftRight.getChildren().add(bottomLeft);
+        bottomLeftRight.getChildren().add(bottomRight);
     }
 
     private void displayThreeGrid(){
-        this.display(topLeftGrid, TopLeftGrid.count, labelArrayList.get(0), topLeftRight);
-        this.display(topRightGrid, TopRightGrid.count, labelArrayList.get(1), topLeftRight);
-        this.display(bottomLeftGrid, BottomLeftGrid.count, labelArrayList.get(2), bottomLeftRight);
-        this.display(bottomRightGrid, BottomRightGrid.count, labelArrayList.get(3), bottomLeftRight);
+        this.display(topLeftGrid, TopLeftGrid.count, labelArrayList.get(0), topLeft);
+        this.display(topRightGrid, TopRightGrid.count, labelArrayList.get(1), topRight);
+        this.display(bottomLeftGrid, BottomLeftGrid.count, labelArrayList.get(2), bottomLeft);
+        this.display(bottomRightGrid, BottomRightGrid.count, labelArrayList.get(3), bottomRight);
     }
 
     /**
@@ -87,13 +111,13 @@ public class ThreeGridController {
      * @param threeGrid 三格版
      * @param count 数量
      * @param label label标签
-     * @param hBox 展示位置
+     * @param vBox 展示位置
      */
-    private void display(ThreeGrid threeGrid, int count, Label label, HBox hBox){
+    private void display(ThreeGrid threeGrid, int count, Label label, VBox vBox){
         GridPane gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER_LEFT);
         gridPane.setPrefSize(100.0, 200.0);
-        HBox.setMargin(gridPane, new Insets(0, 40, 0, 40));
+        VBox.setMargin(gridPane, new Insets(0, 40, 0, 40));
         for (int i=0;i<2;i++) {
             for (int j = 0; j < 2; j++) {
                 if (threeGrid.getThreeGrid().get(i).get(j) != null) {
@@ -103,7 +127,7 @@ public class ThreeGridController {
         }
         label.setText(String.valueOf(count));
         gridPane.add(label, 1, 2);
-        hBox.getChildren().add(gridPane);
+        vBox.getChildren().add(gridPane);
     }
 
     public void changeThreeGridCount(Label label, int count){
@@ -113,7 +137,6 @@ public class ThreeGridController {
     public VBox getThreeVBox(){
         return this.threeVBox;
     }
-
 
     /**
      * 重置三格版标签
@@ -157,5 +180,19 @@ public class ThreeGridController {
         } else {
             System.err.println("输入的key值无效, 默认范围为0-3");
         }
+    }
+
+
+    public void dragEvent(){
+        // 对于每一个三个板添加上标签
+        topLeft.setId("0");
+        topRight.setId("1");
+        bottomLeft.setId("2");
+        bottomRight.setId("3");
+        // 监听拖动事件
+        ClickEvent.click(topLeft);
+        ClickEvent.click(topRight);
+        ClickEvent.click(bottomLeft);
+        ClickEvent.click(bottomRight);
     }
 }

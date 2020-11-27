@@ -42,5 +42,5 @@ public class Position {
     public Position deepCopy(){
         return new Position(this.positionX, this.positionY);
     }
-
 }
+

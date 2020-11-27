@@ -1,5 +1,6 @@
 package model.threegrid;
 
+
 import model.cell.CellType;
 import model.cell.Cells;
 
@@ -20,6 +21,7 @@ public class TopLeftGrid extends ThreeGrid {
         }
         return topLeftGrid;
     }
+
 
     public TopLeftGrid(){
         super();
