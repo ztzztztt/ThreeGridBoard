@@ -2,12 +2,9 @@ package events;
 
 import controller.ChessBoardController;
 import controller.LauncherController;
-import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import model.ChessBoard;
 import model.DoublePosition;
 import model.Position;
