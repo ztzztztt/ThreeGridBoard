@@ -182,6 +182,33 @@ public class ThreeGridController {
         }
     }
 
+    public void cancelLabel(int key){
+        if (labelArrayList.get(key) != null){
+            switch (key){
+                case 0:
+                    TopLeftGrid.count--;
+                    labelArrayList.get(key).setText(String.valueOf(TopLeftGrid.count));
+                    break;
+                case 1:
+                    TopRightGrid.count--;
+                    labelArrayList.get(key).setText(String.valueOf(TopRightGrid.count));
+                    break;
+                case 2:
+                    BottomLeftGrid.count--;
+                    labelArrayList.get(key).setText(String.valueOf(BottomLeftGrid.count));
+                    break;
+                case 3:
+                    BottomRightGrid.count--;
+                    labelArrayList.get(key).setText(String.valueOf(BottomRightGrid.count));
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            System.err.println("输入的key值无效, 默认范围为0-3");
+        }
+    }
+
 
     public void dragEvent(){
         // 对于每一个三个板添加上标签

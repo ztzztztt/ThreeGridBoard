@@ -120,6 +120,8 @@ public class LauncherController {
         toolMenuController.getCancelButton().setOnAction(event -> {
             if (DraggerEvent.getStep() > 0){
                 DraggerEvent.getHashMap().get(DraggerEvent.getStep() - 1).forEach(position -> ChessBoard.getInstance().getTable().get(position.getPositionX()).get(position.getPositionY()).setCellType(CellType.DEFAULT));
+                ThreeGridController.getInstance().cancelLabel(DraggerEvent.getArrList().get(DraggerEvent.getStep() - 1));
+                DraggerEvent.getArrList().remove(DraggerEvent.getStep() - 1);
                 DraggerEvent.setStep(DraggerEvent.getStep() - 1);
             }
         });

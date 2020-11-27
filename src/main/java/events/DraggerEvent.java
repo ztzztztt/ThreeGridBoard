@@ -2,6 +2,7 @@ package events;
 
 import controller.ChessBoardController;
 import controller.LauncherController;
+import controller.ThreeGridController;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
@@ -9,6 +10,10 @@ import model.ChessBoard;
 import model.DoublePosition;
 import model.Position;
 import model.cell.CellType;
+import model.threegrid.BottomLeftGrid;
+import model.threegrid.BottomRightGrid;
+import model.threegrid.TopLeftGrid;
+import model.threegrid.TopRightGrid;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +28,9 @@ public class DraggerEvent {
     private static double cellSize = 40.0;
     private static double borderOffset = 0;
     private static int step = 0;
+    private static int key = -1;
     private static final HashMap<Integer, ArrayList<Position>> hashMap = new HashMap<>();
+    private static final ArrayList<Integer> arrList = new ArrayList<>();
 
     public static void draggable(Node node){
         final DoublePosition pos = new DoublePosition();
@@ -33,6 +40,7 @@ public class DraggerEvent {
         node.addEventHandler(MouseEvent.MOUSE_EXITED, event -> node.setCursor(Cursor.DEFAULT));
         // 提示用户该结点可拖拽
         node.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
+            key = Integer.parseInt(node.getId());
             node.setCursor(Cursor.MOVE);
             // 当按压事件发生时，缓存事件发生的位置坐标
             pos.x = event.getX();
@@ -42,74 +50,82 @@ public class DraggerEvent {
         node.addEventHandler(MouseEvent.MOUSE_RELEASED, event -> {
             node.setCursor(Cursor.DEFAULT);
             updateParams();
-            System.out.println(borderOffset);
             int x = (int)((finPos.x - borderOffset) / cellSize);
             int y = (int)((finPos.y - borderOffset) / cellSize);
             if (x >= borderSize || y >= borderSize){
                 System.out.println("Out of Chess Border");
-            } else{
-                int key = Integer.parseInt(node.getId());
-                ArrayList<Position> arrayList = new ArrayList<>(3);
-                switch(key){
-                    case 0:
-                        arrayList.add(new Position(y+1, x));
-                        arrayList.add(new Position(y, x+1));
-                        arrayList.add(new Position(y+1, x+1));
-                        hashMap.put(step, arrayList);
-                        ChessBoard.getInstance().getTable().get(y + 1).get(x).setCellType(CellType.getCellTypeByValue(key));
-                        ChessBoard.getInstance().getTable().get(y).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
-                        ChessBoard.getInstance().getTable().get(y + 1).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
-                        break;
-                    case 1:
-                        arrayList.add(new Position(y, x));
-                        arrayList.add(new Position(y+1, x));
-                        arrayList.add(new Position(y+1, x+1));
-                        hashMap.put(step, arrayList);
-                        ChessBoard.getInstance().getTable().get(y).get(x).setCellType(CellType.getCellTypeByValue(key));
-                        ChessBoard.getInstance().getTable().get(y + 1).get(x).setCellType(CellType.getCellTypeByValue(key));
-                        ChessBoard.getInstance().getTable().get(y + 1).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
-                        break;
-                    case 2:
-                        arrayList.add(new Position(y, x));
-                        arrayList.add(new Position(y, x+1));
-                        arrayList.add(new Position(y+1, x+1));
-                        hashMap.put(step, arrayList);
-                        ChessBoard.getInstance().getTable().get(y).get(x).setCellType(CellType.getCellTypeByValue(key));
-                        ChessBoard.getInstance().getTable().get(y).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
-                        ChessBoard.getInstance().getTable().get(y + 1).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
-                        break;
-                    case 3:
-                        arrayList.add(new Position(y, x));
-                        arrayList.add(new Position(y, x+1));
-                        arrayList.add(new Position(y+1, x));
-                        hashMap.put(step, arrayList);
-                        ChessBoard.getInstance().getTable().get(y).get(x).setCellType(CellType.getCellTypeByValue(key));
-                        ChessBoard.getInstance().getTable().get(y).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
-                        ChessBoard.getInstance().getTable().get(y + 1).get(x).setCellType(CellType.getCellTypeByValue(key));
-                        break;
-                    default:
-                        break;
+            } else {
+                try{
+                    key = Integer.parseInt(node.getId());
+                    ArrayList<Position> arrayList = new ArrayList<>(3);
+                    arrList.add(key);
+                    switch(key){
+                        case 0:
+                            arrayList.add(new Position(y+1, x));
+                            arrayList.add(new Position(y, x+1));
+                            arrayList.add(new Position(y+1, x+1));
+                            hashMap.put(step, arrayList);
+                            ChessBoard.getInstance().getTable().get(y + 1).get(x).setCellType(CellType.getCellTypeByValue(key));
+                            ChessBoard.getInstance().getTable().get(y).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
+                            ChessBoard.getInstance().getTable().get(y + 1).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
+                            break;
+                        case 1:
+                            arrayList.add(new Position(y, x));
+                            arrayList.add(new Position(y+1, x));
+                            arrayList.add(new Position(y+1, x+1));
+                            hashMap.put(step, arrayList);
+                            ChessBoard.getInstance().getTable().get(y).get(x).setCellType(CellType.getCellTypeByValue(key));
+                            ChessBoard.getInstance().getTable().get(y + 1).get(x).setCellType(CellType.getCellTypeByValue(key));
+                            ChessBoard.getInstance().getTable().get(y + 1).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
+                            break;
+                        case 2:
+                            arrayList.add(new Position(y, x));
+                            arrayList.add(new Position(y, x+1));
+                            arrayList.add(new Position(y+1, x+1));
+                            hashMap.put(step, arrayList);
+                            ChessBoard.getInstance().getTable().get(y).get(x).setCellType(CellType.getCellTypeByValue(key));
+                            ChessBoard.getInstance().getTable().get(y).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
+                            ChessBoard.getInstance().getTable().get(y + 1).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
+                            break;
+                        case 3:
+                            arrayList.add(new Position(y, x));
+                            arrayList.add(new Position(y, x+1));
+                            arrayList.add(new Position(y+1, x));
+                            hashMap.put(step, arrayList);
+                            ChessBoard.getInstance().getTable().get(y).get(x).setCellType(CellType.getCellTypeByValue(key));
+                            ChessBoard.getInstance().getTable().get(y).get(x + 1).setCellType(CellType.getCellTypeByValue(key));
+                            ChessBoard.getInstance().getTable().get(y + 1).get(x).setCellType(CellType.getCellTypeByValue(key));
+                            break;
+                        default:
+                            break;
+                    }
+                    step ++;
+                    // 清楚原来的节点
+                    ThreeGridController.getInstance().refreshLabel(key);
+                    LauncherController.getInstance().getAnchorPane().getChildren().remove(node);
+                } catch (Exception e){
+                    System.err.println("Out of ChessBoard");
                 }
-                step ++;
-                // 清楚原来的节点
-                LauncherController.getInstance().getAnchorPane().getChildren().remove(node);
             }
         });
         // 实现拖拽功能
         node.addEventHandler(MouseEvent.MOUSE_DRAGGED, event -> {
-            updateParams();
-            double distanceX = event.getX() - pos.x;
-            double distanceY = event.getY() - pos.y;
-
-            double x = node.getLayoutX() + distanceX;
-            double y = node.getLayoutY() + distanceY;
-
-            // 由于棋盘之前偏移了10个像素，则需要将其修改回来
-            x = (int)(x / cellSize) * cellSize + 10;
-            y = (int)(y / cellSize) * cellSize + 10;
-            finPos.x = x;
-            finPos.y = y;
-            node.relocate(x, y);
+            try{
+                updateParams();
+                key = Integer.parseInt(node.getId());
+                double distanceX = event.getX() - pos.x;
+                double distanceY = event.getY() - pos.y;
+                double x = node.getLayoutX() + distanceX;
+                double y = node.getLayoutY() + distanceY;
+                // 由于棋盘之前偏移了10个像素，则需要将其修改回来
+                x = (int)(x / cellSize) * cellSize + 10;
+                y = (int)(y / cellSize) * cellSize + 10;
+                finPos.x = x;
+                finPos.y = y;
+                node.relocate(x, y);
+            } catch (Exception e){
+                System.err.println(e.toString());
+            }
         });
     }
 
@@ -129,5 +145,9 @@ public class DraggerEvent {
 
     public static void setStep(int s){
         step = s;
+    }
+
+    public static ArrayList<Integer> getArrList(){
+        return arrList;
     }
 }
