@@ -7,11 +7,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.scene.control.Toggle;
 import javafx.scene.layout.AnchorPane;
 import model.ChessBoard;
-import model.Position;
 import model.cell.CellType;
 import service.Solution;
 
-import java.util.ArrayList;
 
 /**
  * @author by zhoutao

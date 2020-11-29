@@ -5,7 +5,6 @@ import javafx.application.Platform;
 import model.ChessBoard;
 import model.Position;
 import java.util.ArrayList;
-import java.util.Timer;
 
 
 /**
@@ -13,7 +12,7 @@ import java.util.Timer;
  * @description 解决三格版问题的类
  * @date 2020/10/30 17:28
  */
-public class Solution implements Runnable{
+public class Solution{
 
     private static double delay = 0.5;
     private int chessBoardSize;
@@ -115,11 +114,6 @@ public class Solution implements Runnable{
         } catch (InterruptedException e) {
             System.err.println(e.toString());
         }
-    }
-
-    @Override
-    public void run() {
-        this.resolve();
     }
 }
 

@@ -11,7 +11,7 @@ import model.ChessBoard;
  */
 public class ChessBoardController {
     private GridPane chessBoardPane;
-    private ChessBoard chessBoard;
+    private final ChessBoard chessBoard;
     private int defaultSize;
 
 
