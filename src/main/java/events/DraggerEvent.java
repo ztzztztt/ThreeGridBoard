@@ -10,10 +10,6 @@ import model.ChessBoard;
 import model.DoublePosition;
 import model.Position;
 import model.cell.CellType;
-import model.threegrid.BottomLeftGrid;
-import model.threegrid.BottomRightGrid;
-import model.threegrid.TopLeftGrid;
-import model.threegrid.TopRightGrid;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,7 +48,7 @@ public class DraggerEvent {
             updateParams();
             int x = (int)((finPos.x - borderOffset) / cellSize);
             int y = (int)((finPos.y - borderOffset) / cellSize);
-            if (x >= borderSize || y >= borderSize){
+            if (x >= borderSize || y >= borderSize || x + 1 >= borderSize || y + 1 >= borderSize){
                 System.out.println("Out of Chess Border");
             } else {
                 try{
@@ -103,6 +99,7 @@ public class DraggerEvent {
                     // 清楚原来的节点
                     ThreeGridController.getInstance().refreshLabel(key);
                     LauncherController.getInstance().getAnchorPane().getChildren().remove(node);
+                    ClickEvent.clearNode(key);
                 } catch (Exception e){
                     System.err.println("Out of ChessBoard");
                 }
@@ -150,4 +147,5 @@ public class DraggerEvent {
     public static ArrayList<Integer> getArrList(){
         return arrList;
     }
+
 }

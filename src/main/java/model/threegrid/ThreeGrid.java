@@ -1,7 +1,5 @@
 package model.threegrid;
 
-import javafx.scene.control.Label;
-import javafx.scene.shape.Circle;
 import model.cell.CellType;
 import model.cell.Cells;
 import java.util.Vector;
